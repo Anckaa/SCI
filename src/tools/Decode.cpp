@@ -1,37 +1,39 @@
 #include <stdafx.h>
-#include "cDecode.h"
+#include "Decode.h"
+#include <cstring>
 
-cDecode* cDecode::Make(eDecodeType type)
+using namespace std;
+
+Decode* Decode::Make(eType type) noexcept
 {
     switch(type)
     {
-    case eDecodeType::dcl_explode_1:
-    case eDecodeType::dcl_explode_2:
-    case eDecodeType::dcl_explode_3:
-        return new (std::nothrow) cDecodeExplode();
-
+    case dcl_explode_1:
+    case dcl_explode_2:
+    case dcl_explode_3:
+        return new (std::nothrow) DecodeExplode();
     default:
         return nullptr;
     }
 }
 
-bool cDecode::Verify(const uint8_t *data, std::size_t data_size, std::size_t result_size, std::string &err)
+bool Decode::Verify(const uint8_t *data, std::size_t data_size, std::size_t result_size, ostream &err) noexcept
 {
-    if(!data)
+    if (!data)
     {
-        err.assign("decode error: compressing data of resource is null");
+        ERROR_TO_STREAM(err) << "decode error: compressing data of resource is null\n";
         return false;
     }
 
-    if(!data_size)
+    if (!data_size)
     {
-        err.assign("decode error: compressing data of resource is empty");
+        ERROR_TO_STREAM(err) << "decode error: compressing data of resource is empty";
         return false;
     }
 
-    if(data_size > result_size)
+    if (data_size > result_size)
     {
-        err.assign("decode error: uncompressing size of resource data is less that after compressing");
+        ERROR_TO_STREAM(err) << "decode error: uncompressing size of resource data is less that after compressing";
         return false;
     }
 
@@ -39,18 +41,16 @@ bool cDecode::Verify(const uint8_t *data, std::size_t data_size, std::size_t res
 }
 
 
-const uint16_t cDecodeExplode::s_mantissa[] = { 0x07, 0x08, 0x0a, 0x0e, 0x16, 0x26, 0x46, 0x86, 0x106 };
-
-std::size_t cDecodeExplode::Apply(const uint8_t *in_data, std::size_t in_size, uint8_t *out_data, std::size_t out_size, std::string &err)
+std::size_t DecodeExplode::Apply(const uint8_t *in_data, std::size_t in_size, uint8_t *out_data, std::size_t out_size, std::ostream &err)
 {
-    static const uint8_t mantissa_size = _countof(s_mantissa);
-
-    if(!Verify(in_data, in_size, out_size, err))
-        return 0;
-
-    if(in_size < 3)
+    if (!Verify(in_data, in_size, out_size, err))
     {
-        err.assign("input data for decode is incorrectly");
+        return 0;
+    }
+
+    if (in_size < 3)
+    {
+        ERROR_TO_STREAM(err) << "input data for decode is incorrectly";
         return 0;
     }
 
@@ -58,9 +58,9 @@ std::size_t cDecodeExplode::Apply(const uint8_t *in_data, std::size_t in_size, u
     uint8_t        format_val = *(in_data++);
     uint8_t        multiplier = *(in_data++);
 
-    if(format_val != s_bin_format)
+    if (format_val != s_bin_format)
     {
-        err.assign("ascii format for decoding resource data doesn't support");
+        ERROR_TO_STREAM(err) << "ascii format for decoding resource data doesn't support";
         return 0;
     }
 
@@ -70,49 +70,52 @@ std::size_t cDecodeExplode::Apply(const uint8_t *in_data, std::size_t in_size, u
     uint8_t  dist_lo = 0;
     uint16_t dist_hi = 0, dist_val = 0;
     std::size_t    i = 0;
-    while((in_data < terminator) && (i < out_size))
+
+    while ((in_data < terminator) && (i < out_size))
     {
-        if(!bit_reader.BitLE())
+        if (!bit_reader.BitLE())
         {
             out_data[i++] = bit_reader.Byte();
             continue;
         }
 
         len_dat = Huffman1(bit_reader);
-        if(len_dat == s_huffman_bad)
+        if (len_dat == s_huffman_bad)
         {
-            err.assign("decode error: value in huffman(1) is not defined");
+            ERROR_TO_STREAM(err) << "decode error: value in huffman(1) is not defined";
             return 0;
         }
 
-        if(len_dat > 7)
+        if (len_dat > 7)
         {
             len_flt = len_dat - 7;
-            if(len_flt >= mantissa_size)
+            if(len_flt >= s_mantissa_size)
             {
-                err.assign("decode error: float party for define a length is incorrectly");
+                ERROR_TO_STREAM(err) << "decode error: float party for define a length is incorrectly";
                 return 0;
             }
 
             len_val = bit_reader.Bits(len_flt) + s_mantissa[len_flt] + 2;
         }
         else
+        {
             len_val = len_dat + 2;
+        }
 
         if(i + len_val > out_size)
         {
-            err.assign("decode error: uncompressing size of resource data is greater than size of container");
+            ERROR_TO_STREAM(err) << "decode error: uncompressing size of resource data is greater than size of container";
             return 0;
         }
 
         dist_hi = Huffman2(bit_reader);
-        if(dist_hi == s_huffman_bad)
+        if (dist_hi == s_huffman_bad)
         {
-            err.assign("decode error: value in huffman(2) is not defined");
+            ERROR_TO_STREAM(err) << "decode error: value in huffman(2) is not defined";
             return 0;
         }
 
-        if(len_val == 2)
+        if (len_val == 2)
         {
             dist_hi = dist_hi << 2;
             dist_lo = bit_reader.Bits(2);
@@ -126,7 +129,7 @@ std::size_t cDecodeExplode::Apply(const uint8_t *in_data, std::size_t in_size, u
         dist_val = (dist_hi | dist_lo) + 1;
         if (dist_val > i)
         {
-            err.assign("decode error: distance for coping bytes is out of range in container");
+            ERROR_TO_STREAM(err) << "decode error: distance for coping bytes is out of range in container";
             return 0;
         }
 
@@ -145,14 +148,14 @@ std::size_t cDecodeExplode::Apply(const uint8_t *in_data, std::size_t in_size, u
 
     if(in_data < terminator)
     {
-        err.assign("decode error: uncompressing size of resource data is greater than size of container");
+        ERROR_TO_STREAM(err) << "decode error: uncompressing size of resource data is greater than size of container";
         return 0;
     }
 
     return i;
 }
 
-uint8_t cDecodeExplode::Huffman1(BitRead &reader)
+uint8_t DecodeExplode::Huffman1(BitRead &reader)
 {
     // 1 + ...
     if(reader.BitLE())
@@ -220,7 +223,7 @@ uint8_t cDecodeExplode::Huffman1(BitRead &reader)
     return s_huffman_bad;
 }
 
-uint8_t cDecodeExplode::Huffman2(BitRead &reader)
+uint8_t DecodeExplode::Huffman2(BitRead &reader)
 {
     // 1 + ...
     if(reader.BitLE())

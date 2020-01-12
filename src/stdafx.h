@@ -1,6 +1,7 @@
 #ifndef stdafx_h
 #define stdafx_h
 
+// shutdown extra warnings of MSVC
 #ifdef _MSC_VER
 #define _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_DEPRECATE
@@ -15,8 +16,8 @@
 #include <algorithm>
 */
 #include <climits>
-#include <iostream>
-#include <fstream>
+#include <iostream> //+
+#include <fstream>  //+
 #include <list>
 #include <map>
 /*
@@ -24,18 +25,15 @@
 */
 #include <set>
 #include <string>
-//#include <stdint.h>
-#include <vector>
-/*
+#include <stdint.h> //+
+#include <vector>   //+
+
 // add Qt modules here
 //#include <QtWidgets>
 
 //add common prject's module here
-#include <SCIFields.h>
 
 //add common variables here
-static const char* s_temp_dir = "temp/";
-*/
 #endif // __cplusplus
 
 #define CLASSNAME_TO_STREAM(stream)                                             \
@@ -46,8 +44,8 @@ static const char* s_temp_dir = "temp/";
 }                                                                               \
 stream
 
-#define CLASSFUNC_TO_STREAM(stream)                                                                 \
-CLASSNAME_TO_STREAM(stream) <<  "::" << __func__ << "(" << static_cast<int>(__LINE__) << " line)";  \
+#define CLASSFUNC_TO_STREAM(stream)                                                                                                 \
+CLASSNAME_TO_STREAM(stream) <<  "::" << __func__ << "(), \"" << __FILE__  << "\"" << ", " << static_cast<int>(__LINE__) << " line"; \
 stream
 
 #define ERROR_TO_STREAM(stream)         \

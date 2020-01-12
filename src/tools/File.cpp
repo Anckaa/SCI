@@ -5,25 +5,25 @@ using namespace std;
 
 bool File::Open(const char *filename, ostream &err)
 {
-    if(!filename || !*filename)
+    if (!filename || !*filename)
     {
         ERROR_TO_STREAM(err) << "filename is empty\n";
         return false;
     }
 
-    if(m_stream.is_open())
+    if (m_stream.is_open())
     {
-        if(m_filename.compare(filename) == 0)
+        if (m_filename.compare(filename) == 0)
         {
             return true;
         }
 
-        ERROR_TO_STREAM(err) << "'" << m_filename.c_str() << "' is opening instead '" << filename << "'\n";
+        ERROR_TO_STREAM(err) << "'" << m_filename.c_str() << "' open instead '" << filename << "'\n";
         return false;
     }
 
     m_stream.open(filename, m_mode);
-    if(!m_stream)
+    if (!m_stream)
     {
         ERROR_TO_STREAM(err) << "'" << filename << "' is inexistent\n";
         return false;
@@ -37,13 +37,15 @@ bool File::Open(const char *filename, ostream &err)
 void File::Close()
 {
     m_filename.clear();
-    if(m_stream.is_open())
+    if (m_stream.is_open())
+    {
         m_stream.close();
+    }
 }
 
-bool File::Read(Data &buffer, Data::size_type size, ostream &err)
+bool File::Read(Data &buffer, Data::size_type size, ostream &err) noexcept
 {
-    if(!m_stream)
+    if (!m_stream)
     {
         ERROR_TO_STREAM(err) << "file isn't opened\n";
         return false;
@@ -65,7 +67,7 @@ bool File::Read(Data &buffer, Data::size_type size, ostream &err)
         return false;
     }
 
-    streamsize ss_size = streamsize(size);
+    streamsize ss_size = static_cast<streamsize>(size);
     m_stream.read(reinterpret_cast<char *>(buffer.data()), ss_size);
     if(m_stream.gcount() != ss_size)
     {
@@ -75,6 +77,7 @@ bool File::Read(Data &buffer, Data::size_type size, ostream &err)
 
     return true;
 }
+
 /*
 bool File::CopyTo(File &destination, ostream &err)
 {

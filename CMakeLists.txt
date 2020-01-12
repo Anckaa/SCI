@@ -3,24 +3,22 @@ cmake_minimum_required (VERSION 3.2)
 project (SCIEditor)
 
 # Widgets finds its own dependencies.s
-find_package(Qt5Widgets REQUIRED) #!!!
+find_package(Qt5Core REQUIRED)
+find_package(Qt5Widgets REQUIRED)
 # Tell CMake to run moc when necessary:
-set(CMAKE_AUTOMOC ON) #!!!
+set(CMAKE_AUTOMOC ON)
 # As moc files are generated in the binary dir, tell CMake to always look for includes there:
-set(CMAKE_INCLUDE_CURRENT_DIR ON) #!!!
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # All binaries are located in the bin - folder
 set(EXECUTABLE_OUTPUT_PATH ${CMAKE_CURRENT_SOURCE_DIR}/bin)
-
 # Source directory variable
 set(CMAKE_CURRENT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 # User's interface directory variable
-set(UI_PATH ${CMAKE_CURRENT_SOURCE_DIR}/ui) #!!!
+set(UI_PATH ${CMAKE_CURRENT_SOURCE_DIR}/ui)
 # GUI implementation directory variable
-set(IMPLEMENT_UI_PATH ${SOURCE_PATH}/ui) #!!!
-
-find_package(Qt5Core REQUIRED) #!!!
+set(IMPLEMENT_UI_PATH ${SOURCE_PATH}/ui)
 
 include_directories(${CMAKE_CURRENT_BINARY_DIR}
                     # project directories
@@ -34,8 +32,8 @@ include_directories(${CMAKE_CURRENT_BINARY_DIR}
 set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/stdafx.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/tools/File.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/tools/cDecode.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/tools/File.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/tools/Decode.cpp
 #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/ResourcePage.cpp
 #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/ResourceMap.cpp
 #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/ResourcePackage.cpp
@@ -55,5 +53,6 @@ set(SOURCES
 add_executable(${PROJECT_NAME} ${SOURCES})
 qt5_use_modules(${PROJECT_NAME} Widgets)
 
+# Set up precompile header
 include("${CMAKE_CURRENT_LIST_DIR}/precompile.cmake")
-ADD_PRECOMPILED_HEADER(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/stdafx.h" FORCEINCLUDE)
+ADD_PRECOMPILED_HEADER(${PROJECT_NAME} "${CMAKE_CURRENT_SOURCE_DIR}/stdafx.h") # FORCEINCLUDE

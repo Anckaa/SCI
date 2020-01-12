@@ -1,5 +1,6 @@
 #include "stdafx.h"
-//#include "tools/File.h"
+#include "tools/File.h"
+
 //#include "ResourceImpl.h"
 //#include "entity/Font.h"
 
@@ -11,6 +12,7 @@
 #include <qpushbutton.h>
 
 using namespace std;
+
 /*
 int output(const cResource &resource)
 {
@@ -50,13 +52,13 @@ void output(const tResouceData &data)
 
 int main(int argc, char* argv[])
 {
+/*
     QApplication app(argc, argv);
     QPushButton hello( "Hello world!", 0 );
     hello.resize( 100, 30 );
     hello.show();
     return app.exec();
-
-/*
+*/
     File file{ std::ios_base::in | std::ios_base::binary };
     file.Open("RESOURCE.MAP", std::cerr);
 /*
@@ -134,5 +136,5 @@ int main(int argc, char* argv[])
     QApplication app(argc, argv);
     return app.exec();
 */
-//    return 0;
+    return 0;
 }
