@@ -1,71 +1,68 @@
 #include <stdafx.h>
-#include "ResourceImpl.h"
+#include "ResourceAPI.h"
 
 using namespace std;
 
-bool ResourceImpl::Open(const char *filename, ostream &err)
+bool ResourceAPI::Open(const char *filename, ostream &err)
 {
     Close();
-/*
+
     // TODO: need supporting for absolute path
-    if(!m_map.Open("RESOURCE.MAP", err))
+    if(!m_map.Open(filename, err))
     {
         ERROR_TO_STREAM(err) << "map file doesn't open\n";
         return false;
     }
-*/
+
     return true;
 }
 
-bool ResourceImpl::PreparePackages(Resource::Package amount, ostream &err)
+bool ResourceAPI::PreparePackages(Package package_amount, ostream &err)
 {
-/*
     m_packages.clear();
 
     try
     {
-        m_packages.resize(amount);
+        m_packages.resize(package_amount);
     }
     catch (std::bad_alloc exception)
     {
         ERROR_TO_STREAM(err) << exception.what() << "\n";
         return false;
     }
-*/
+
     return true;
 }
 
-bool ResourceImpl::OpenPackage(Resource::Package index, const char *filename, ostream &err)
+bool ResourceAPI::OpenPackage(Resource::Package package_index, const char *filename, ostream &err)
 {
-/*
-    if(m_packages.Empty())
+    if(m_packages.empty())
     {
         ERROR_TO_STREAM(err) << "attempt to open unexsist package\n";
         return false;
     }
 
-    if(index >= m_packages.size())
+    if(package_index >= m_packages.size())
     {
         ERROR_TO_STREAM(err) << "index of package file is out of range\n";
         return false;
     }
 
-    PackagePtr &package = m_packages[index];
-    if(!package) package.reset(new cResourcePackage());
+    auto &package = m_packages[package_index];
+    if (!package)
+    {
+        package.reset(new cResourcePackage());
+    }
     return package->Open(filename, err);
-*/
-    return true;
 }
 
-void ResourceImpl::Close()
+void ResourceAPI::Close()
 {
-/*
     m_map.Close();
     m_packages.clear();
-*/
 }
 
-const Resource::Data& ResourceImpl::Get(Type type, Id id, ostream &err) const
+const Resource::Data& ResourceAPI::Get(Type type, Id id, ostream &err) const
 {
     static const Data data_empty{0};
 /*
@@ -106,7 +103,7 @@ const Resource::Data& ResourceImpl::Get(Type type, Id id, ostream &err) const
 }
 
 /*
-bool ResourceImpl::Save(ostream &err)
+bool ResourceAPI::Save(ostream &err)
 {
     const cResourcePage::tResourcePtrArray& changing  = m_map.Changing();
     const cResourcePage::tResourcePtrArray& appending = m_map.Appending();
@@ -152,7 +149,7 @@ bool ResourceImpl::Save(ostream &err)
 }
 */
 /*
-bool ResourceImpl::CopyData(PackagePtr &package,
+bool ResourceAPI::CopyData(PackagePtr &package,
                             cResourceMap::tOffsetArray::iterator &offset_cur, const cResourceMap::tOffsetArray::iterator &offset_end, std::string &err)
 {
     if(offset_cur == offset_end)

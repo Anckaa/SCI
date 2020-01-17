@@ -1,45 +1,49 @@
 #pragma once
 
+#include <Decode.h>
 #include <File.h>
-#include <cDecode.h>
+#include "Resource.h"
 
-class cResourcePackage : protected cFile
+/// @brief Processing file with packed resources
+class ResourcePackage : protected File
 {
 public:
-    static const tResourcePosition s_head_size = 9;
+    ResourcePackage(ResourcePackage &&) = delete;
+    ResourcePackage(const ResourcePackage &) = delete;
+    ResourcePackage& operator = (const ResourcePackage &) = delete;
+    ResourcePackage&& operator = (const ResourcePackage &&) = delete;
 
 public:
-    cResourcePackage(const cResourcePackage &) = delete;
-    cResourcePackage(cResourcePackage &&) = delete;
-    cResourcePackage& operator = (const cResourcePackage &) = delete;
-    cResourcePackage&& operator = (const cResourcePackage &&) = delete;
+    /// @brief Constructors
+    ResourcePackage() : File(std::ios_base::in | std::ios_base::binary) {}
+// TODO: ???    ResourcePackage(std::ios_base::openmode mode) : File(mode) {}
 
-public:
-    cResourcePackage() : cFile(std::ios_base::in | std::ios_base::binary) {}
-    cResourcePackage(std::ios_base::openmode mode) : cFile(mode) {}
+    /// @brief share some methods of inherited class (@see File)
+    /// @{
+    const char* Filename() { return File::Filename(); }
+    bool IsOpen()          { return File::IsOpen();   }
+/*
+    bool CopyTo(cResourcePackage &destination, std::string err) { return cFile::CopyTo(destination, err); }
+    bool CopyTo(std::streampos position, cResourcePackage &destination, std::string err) { return cFile::CopyTo(position, destination, err); }
+*/
+    /// @}
 
-    virtual bool Open(const char *filename, std::string &err) override;
+    /// @brief Read base information of resource
+    /// @param type         - type of resource
+    /// @param id           - identifier of resource
+    /// @param decode       - identifier of decoder
+    /// @param pack_size    - size of packed data (actual size of data)
+    /// @param real_size    - expected size of data after that will be unpacked
+    /// @param err          - standard stream for output message about error
+    /// @return true if reading is successed
+    bool ReadHead(Resource::Type &type, Resource::Id &id,
+                  Decode::Type &decode, Resource::Position &pack_size, Resource::Position &real_size, std::ostream &err) noexcept;
 
-    inline bool IsOpen()                     { return cFile::IsOpen(); }
-    inline const char* Filename()            { return cFile::Filename(); }
-    inline std::streampos Position()         { return cFile::Position(); }
-    inline void Position(std::streampos pos) { cFile::Position(pos);     }
-    inline void Seek(std::streamoff offset)  { cFile::Seek(offset);      }
-    inline bool IsEof()                      { return cFile::IsEof();    }
-
-    bool ReadHead(eResourceType &type, tResourceId &id,
-                  eDecodeType &decode, tResourcePosition &comp_size, tResourcePosition &real_size, std::string &err);
-    bool ReadData(eResourceType type, tResourceId index, tResourcePosition position, tResouceData &data, std::string &err);
-
-    inline bool CopyTo(cResourcePackage &destination, std::string err) { return cFile::CopyTo(destination, err); }
-    inline bool CopyTo(std::streampos position, cResourcePackage &destination, std::string err) { return cFile::CopyTo(position, destination, err); }
-
-private:
-    using tDecodeUPtr = std::unique_ptr<cDecode>;
-    using tDecoders   = std::map<eDecodeType, tDecodeUPtr>;
-
-private:
-    tDecoders m_decoders;
-
-    cDecode* Decoder(eDecodeType id, std::string &err);
+    /// @brief Read base information of resource
+    /// @param type - type of resource
+    /// @param id   - identifier of resource
+    /// @param data - unpacked data of resource
+    /// @param err  - standard stream for output message about error
+    /// @return true if reading is successed
+    bool ReadData(Resource::Type type, Resource::Id id, Resource::Position position, Resource::Data &data, std::ostream &err) noexcept;
 };

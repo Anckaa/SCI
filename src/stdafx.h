@@ -15,15 +15,13 @@
 // add C++ includes here
 #include <algorithm>
 */
-#include <climits>
+#include <climits>  //+
 #include <iostream> //+
 #include <fstream>  //+
 #include <list>
 #include <map>
-/*
-#include <memory>
-*/
 #include <set>
+#include <stdexcept>//+
 #include <string>
 #include <stdint.h> //+
 #include <vector>   //+
@@ -51,5 +49,11 @@ stream
 #define ERROR_TO_STREAM(stream)         \
 CLASSFUNC_TO_STREAM(stream) << ":\n\t"; \
 stream
+
+/// @brief User-defined suffix operator _s for more efficiently conversion of string literal to std::string
+inline std::string operator ""_s(const char *text, std::size_t size)
+{
+   return std::string(text, size);
+}
 
 #endif // stdafx_h

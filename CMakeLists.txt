@@ -2,6 +2,10 @@ cmake_minimum_required (VERSION 3.2)
 #set(CMAKE_TRY_COMPILE_TARGET_TYPE "STATIC_LIBRARY")
 project (SCIEditor)
 
+# Set C++ 14 as required
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+
 # Widgets finds its own dependencies.s
 find_package(Qt5Core REQUIRED)
 find_package(Qt5Widgets REQUIRED)
@@ -23,7 +27,6 @@ set(IMPLEMENT_UI_PATH ${SOURCE_PATH}/ui)
 include_directories(${CMAKE_CURRENT_BINARY_DIR}
                     # project directories
                     ${CMAKE_CURRENT_SOURCE_DIR}
-                    ${CMAKE_CURRENT_SOURCE_DIR}/common
                     ${CMAKE_CURRENT_SOURCE_DIR}/tools
                     ${CMAKE_CURRENT_SOURCE_DIR}/resources
 #                    ${IMPLEMENT_UI_PATH}
@@ -34,10 +37,10 @@ set(SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/tools/File.cpp
     ${CMAKE_CURRENT_SOURCE_DIR}/tools/Decode.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/resources/ResourcePage.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/resources/ResourceMap.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/resources/ResourcePackage.cpp
-#    ${CMAKE_CURRENT_SOURCE_DIR}/resources/ResourceImpl.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/ResourcePage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/ResourceMap.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/ResourcePackage.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/resources/ResourceAPI.cpp
     # -----
 #    ${CMAKE_CURRENT_SOURCE_DIR}/resources/entity/Font.cpp
 #    ${IMPLEMENT_UI_PATH}/MainFrame.cpp

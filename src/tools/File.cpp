@@ -5,6 +5,8 @@ using namespace std;
 
 bool File::Open(const char *filename, ostream &err)
 {
+    Close();
+
     if (!filename || !*filename)
     {
         ERROR_TO_STREAM(err) << "filename is empty\n";
@@ -68,10 +70,17 @@ bool File::Read(Data &buffer, Data::size_type size, ostream &err) noexcept
     }
 
     streamsize ss_size = static_cast<streamsize>(size);
-    m_stream.read(reinterpret_cast<char *>(buffer.data()), ss_size);
-    if(m_stream.gcount() != ss_size)
+    try
     {
-        ERROR_TO_STREAM(err) << "binary data doesn't read\n";
+        m_stream.read(reinterpret_cast<char *>(buffer.data()), ss_size);
+        if(m_stream.gcount() != ss_size)
+        {
+            throw ios_base::failure("binary data doesn't read"_s);
+        }
+    }
+    catch (const ios_base::failure& ex)
+    {
+        ERROR_TO_STREAM(err) << ex.what() << "\n";
         return false;
     }
 

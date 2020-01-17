@@ -1,23 +1,23 @@
 #include <stdafx.h>
 #include "Decode.h"
-#include <cstring>
 
 using namespace std;
 
-Decode* Decode::Make(eType type) noexcept
+Decode* Decode::Make(Type type) noexcept
 {
     switch(type)
     {
+    case type_none:
+    case type_null:
+        return nullptr;
     case dcl_explode_1:
     case dcl_explode_2:
     case dcl_explode_3:
         return new (std::nothrow) DecodeExplode();
-    default:
-        return nullptr;
     }
 }
 
-bool Decode::Verify(const uint8_t *data, std::size_t data_size, std::size_t result_size, ostream &err) noexcept
+bool Decode::Verify(const uint8_t *data, std::size_t data_size, std::size_t max_size, ostream &err) noexcept
 {
     if (!data)
     {
@@ -27,13 +27,13 @@ bool Decode::Verify(const uint8_t *data, std::size_t data_size, std::size_t resu
 
     if (!data_size)
     {
-        ERROR_TO_STREAM(err) << "decode error: compressing data of resource is empty";
+        ERROR_TO_STREAM(err) << "decode error: compressing data of resource is empty\n";
         return false;
     }
 
-    if (data_size > result_size)
+    if (data_size > max_size)
     {
-        ERROR_TO_STREAM(err) << "decode error: uncompressing size of resource data is less that after compressing";
+        ERROR_TO_STREAM(err) << "decode error: uncompressing size of resource data is less that after compressing\n";
         return false;
     }
 
@@ -41,48 +41,48 @@ bool Decode::Verify(const uint8_t *data, std::size_t data_size, std::size_t resu
 }
 
 
-std::size_t DecodeExplode::Apply(const uint8_t *in_data, std::size_t in_size, uint8_t *out_data, std::size_t out_size, std::ostream &err)
+std::size_t DecodeExplode::Apply(const uint8_t *in_data_ptr, std::size_t in_size, uint8_t *out_data_ptr, std::size_t out_max_size, std::ostream &err)
 {
-    if (!Verify(in_data, in_size, out_size, err))
+    if (!Verify(in_data_ptr, in_size, out_max_size, err))
     {
         return 0;
     }
 
     if (in_size < 3)
     {
-        ERROR_TO_STREAM(err) << "input data for decode is incorrectly";
+        ERROR_TO_STREAM(err) << "input data for decode is incorrectly\n";
         return 0;
     }
 
-    const uint8_t *terminator = in_data + in_size - 3;
-    uint8_t        format_val = *(in_data++);
-    uint8_t        multiplier = *(in_data++);
+    const uint8_t *terminator = in_data_ptr + in_size - 3;
+    uint8_t        format_val = *in_data_ptr++;
+    uint8_t        multiplier = *in_data_ptr++;
 
     if (format_val != s_bin_format)
     {
-        ERROR_TO_STREAM(err) << "ascii format for decoding resource data doesn't support";
+        ERROR_TO_STREAM(err) << "ascii format for decoding resource data doesn't support\n";
         return 0;
     }
 
-    BitRead bit_reader(in_data);
+    BitRead bit_reader(in_data_ptr);
     uint8_t  len_dat = 0, len_flt = 0;
     uint16_t len_val = 0;
     uint8_t  dist_lo = 0;
     uint16_t dist_hi = 0, dist_val = 0;
     std::size_t    i = 0;
 
-    while ((in_data < terminator) && (i < out_size))
+    while (in_data_ptr < terminator && i < out_max_size)
     {
         if (!bit_reader.BitLE())
         {
-            out_data[i++] = bit_reader.Byte();
+            out_data_ptr[i++] = bit_reader.Byte();
             continue;
         }
 
         len_dat = Huffman1(bit_reader);
         if (len_dat == s_huffman_bad)
         {
-            ERROR_TO_STREAM(err) << "decode error: value in huffman(1) is not defined";
+            ERROR_TO_STREAM(err) << "decode error: value in huffman(1) is not defined\n";
             return 0;
         }
 
@@ -91,7 +91,7 @@ std::size_t DecodeExplode::Apply(const uint8_t *in_data, std::size_t in_size, ui
             len_flt = len_dat - 7;
             if(len_flt >= s_mantissa_size)
             {
-                ERROR_TO_STREAM(err) << "decode error: float party for define a length is incorrectly";
+                ERROR_TO_STREAM(err) << "decode error: float party for define a length is incorrectly\n";
                 return 0;
             }
 
@@ -102,53 +102,56 @@ std::size_t DecodeExplode::Apply(const uint8_t *in_data, std::size_t in_size, ui
             len_val = len_dat + 2;
         }
 
-        if(i + len_val > out_size)
+        if(i + len_val > out_max_size)
         {
-            ERROR_TO_STREAM(err) << "decode error: uncompressing size of resource data is greater than size of container";
+            ERROR_TO_STREAM(err) << "decode error: uncompressing size of resource data is greater than size of container\n";
             return 0;
         }
 
         dist_hi = Huffman2(bit_reader);
         if (dist_hi == s_huffman_bad)
         {
-            ERROR_TO_STREAM(err) << "decode error: value in huffman(2) is not defined";
+            ERROR_TO_STREAM(err) << "decode error: value in huffman(2) is not defined\n";
             return 0;
         }
 
         if (len_val == 2)
         {
-            dist_hi = dist_hi << 2;
+            dist_hi = static_cast<uint16_t>(dist_hi << 2);
             dist_lo = bit_reader.Bits(2);
         }
         else
         {
-            dist_hi = dist_hi << multiplier;
+            dist_hi = static_cast<uint16_t>(dist_hi << multiplier);
             dist_lo = bit_reader.Bits(multiplier);
         }
 
         dist_val = (dist_hi | dist_lo) + 1;
         if (dist_val > i)
         {
-            ERROR_TO_STREAM(err) << "decode error: distance for coping bytes is out of range in container";
+            ERROR_TO_STREAM(err) << "decode error: distance for coping bytes is out of range in container\n";
             return 0;
         }
 
         if(len_val > dist_val)
+        {
             for(std::size_t len_cnt = 0, len_max = len_val / dist_val; len_cnt < len_max; ++len_cnt, len_val -= dist_val)
             {
-                memcpy(&out_data[i], &out_data[i - dist_val], dist_val);
+                memcpy(&out_data_ptr[i], &out_data_ptr[i - dist_val], dist_val);
                 i += dist_val;
             }
+        }
+
         if(len_val)
         {
-            memcpy(&out_data[i], &out_data[i - dist_val], len_val);
+            memcpy(&out_data_ptr[i], &out_data_ptr[i - dist_val], len_val);
             i += len_val;
         }
     }
 
-    if(in_data < terminator)
+    if(in_data_ptr < terminator)
     {
-        ERROR_TO_STREAM(err) << "decode error: uncompressing size of resource data is greater than size of container";
+        ERROR_TO_STREAM(err) << "decode error: uncompressing size of resource data is greater than size of container\n";
         return 0;
     }
 
