@@ -22,7 +22,7 @@ public:
     };
 
 public:
-    /// @brief Factory mathod
+    /// @brief Factory method
     /// @param type - type of decode
     /// @return Pointer to decoder
     static Decode* Make(Type type) noexcept;

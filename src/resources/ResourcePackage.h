@@ -8,15 +8,13 @@
 class ResourcePackage : protected File
 {
 public:
+    /// @brief Constructors
+    ResourcePackage() : File(std::ios_base::in | std::ios_base::binary) {}
+// TODO: ???    ResourcePackage(std::ios_base::openmode mode) : File(mode) {}
     ResourcePackage(ResourcePackage &&) = delete;
     ResourcePackage(const ResourcePackage &) = delete;
     ResourcePackage& operator = (const ResourcePackage &) = delete;
     ResourcePackage&& operator = (const ResourcePackage &&) = delete;
-
-public:
-    /// @brief Constructors
-    ResourcePackage() : File(std::ios_base::in | std::ios_base::binary) {}
-// TODO: ???    ResourcePackage(std::ios_base::openmode mode) : File(mode) {}
 
     /// @brief share some methods of inherited class (@see File)
     /// @{

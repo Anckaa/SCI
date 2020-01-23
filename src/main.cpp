@@ -62,7 +62,7 @@ int main(int argc, char* argv[])
     File file{ std::ios_base::in | std::ios_base::binary };
     file.Open("RESOURCE.MAP", std::cerr);
 /*
-    ResourceImpl resource;
+    ResourceAPI resource;
     bool opened = resource.Open(nullptr, err);  // "d:\\projects\\Qt\\SCI\\bin\\RESOURCE.MAP"
     if(!opened)
     {

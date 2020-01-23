@@ -3,6 +3,7 @@
 #include <File.h>
 #include "ResourcePage.h"
 
+/// @brief Resouce's map accessor
 class ResourceMap : protected File
 {
 public:
@@ -15,36 +16,30 @@ public:
     };
     using Items = std::vector<Item>;
 
+
 public:
+    /// @brief Constructors and destructor
+    ResourceMap() : File(std::ios_base::in | std::ios_base::binary) {}
     ResourceMap(const ResourceMap &) = delete;
     ResourceMap(ResourceMap &&) = delete;
     ResourceMap& operator = (const ResourceMap &) = delete;
     ResourceMap&& operator = (const ResourceMap &&) = delete;
-
-public:
-    ResourceMap(Resource *owner) : File(std::ios_base::in | std::ios_base::binary), m_owner(owner) {}
-    ResourceMap(std::ios_base::openmode mode) : File(mode), m_owner(nullptr) {}
-    ~ResourceMap() { Reset(); }
+    ~ResourceMap() { Clear(); }
 
     /// @overload File
+    /// @{
     bool Open(const char *filename, std::ostream &err) override;
     void Close() override;
+    /// @}
 
-    const ResourcePage& At(Resource::Type type) const;
-//    const ResourcePage& operator[](Resource::Type type) const { return m_pages[type]; }
-
-/*
-    bool Delete(eResourceType type, tResourceId id, std::ostream &err);
-    bool Insert(eResourceType type, tResourceId id, const tResouceData &data, std::ostream &err);
-
-    inline const ResourcePage::ResourcePtrArray& Changing()  { return m_changing;  }
-    inline const ResourcePage::ResourcePtrArray& Appending() { return m_appending; }
-
-    bool Save(tOffsetArray &offsets, std::ostream &err, bool sorting_offsets = true);
-*/
+    /// @brief Get page with resources for specified type
+    /// @param type - type of resources (see to Resource::Type)
+    /// @return const reference to the page
+    const ResourcePage& operator[](Resource::Type type) const { return m_pages[type]; }
 
 protected:
-    void Reset();
+    /// @brief Clear all map data
+    void Clear();
 
 private:
     using HeadPosition = uint16_t;
@@ -63,12 +58,20 @@ private:
     static const std::size_t s_page_item_size = 6;      // page item of resource (in bits): 16 (id) + 28 (position) + 4 (index of package)
     static const Resource::Package s_package_size = 16; // total packages involved (index for filename "RESOURCE.XXX")
 
-    Resource *m_owner;
     TypePages m_pages;
-/*
-    ResourcePage::ResourcePtrArray m_appending;
-    ResourcePage::ResourcePtrArray m_changing;
-*/
-    HeadPosition ReadHead(Heads &head, std::ostream &err);
-    bool ReadPage(HeadPosition from, HeadPosition to, Packages &packages, ResourcePage &resources, std::ostream &err);
+
+    /// @brief Reading fields of heads
+    /// @param head - reference to list of heads
+    /// @param err  - standard stream for output message about error
+    /// @return The first position in file after head
+    Resource::Position ReadHead(Heads &head, std::ostream &err);
+
+    /// @brief Reading fields of resources
+    /// @param from     - position in file for begin reading
+    /// @param to       - position in file of end reading
+    /// @param packages - list with using packages
+    /// @param resources- list of pages with resources
+    /// @param err      - standard stream for output message about error
+    /// @return true if reading is finished sucessfully
+    bool ReadPage(Resource::Position from, Resource::Position to, Packages &packages, ResourcePage &resources, std::ostream &err);
 };

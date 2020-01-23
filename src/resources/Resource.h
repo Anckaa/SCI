@@ -42,19 +42,16 @@ public:
     using Package = uint8_t;
     using Position = uint32_t;
 
-// TODO: !!! Look for access to type
+/* TODO: !!! Look for access to type
 private:
     using Offset = int64_t;
+*/
+public:
+    static constexpr auto s_id_none = std::numeric_limits<Id>::max();
+    static constexpr auto s_package_none = std::numeric_limits<Package>::max();
+    static constexpr auto s_position_none = std::numeric_limits<Position>::max();
 
 public:
-    static const auto s_id_none = std::numeric_limits<Id>::max();
-    static const auto s_package_none = std::numeric_limits<Package>::max();
-    static const auto s_position_none = std::numeric_limits<Position>::max();
-
-public:
-    /// @brief Destructor
-    virtual ~Resource() = default;
-
     /// @brief Init package container
     /// @param package_amount   - amount of packages
     /// @param err              - standard stream for output message about error
@@ -67,4 +64,7 @@ public:
     /// @param err              - standard stream for output message about error
     /// @return true if initialization was successed
     virtual bool OpenPackage(Package package_index, const char *filename, std::ostream &err) = 0;
+
+private:
+    virtual ~Resource() = default;
 };

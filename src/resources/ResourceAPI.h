@@ -7,14 +7,12 @@
 class ResourceAPI : private Resource
 {
 public:
+    /// @brief Constructors
+    ResourceAPI() : m_map(this) {}
     ResourceAPI(ResourceAPI &&) = delete;
     ResourceAPI(const ResourceAPI &) = delete;
     ResourceAPI& operator = (const ResourceAPI &) = delete;
     ResourceAPI&& operator = (const ResourceAPI &&) = delete;
-
-public:
-    /// @brief Constructor
-    ResourceAPI() : m_map(this) {}
 
     /// @brief Open map file with resources
     /// @param filename - name of map file
@@ -34,7 +32,7 @@ public:
     /// @param type - type of resource (see to Resource::Type)
     /// @param Id   - Index of resource
     /// @param err  - standard stream for output message about error
-    /// @return const reference to the binary data
+    /// @return reference to the binary data
     const Data& Get(Type type, Id id, std::ostream &err) const;
 /*
     inline bool Delete(ResourceType type, Id id, std::ostream &err) { return m_map.Delete(type, id, err); }

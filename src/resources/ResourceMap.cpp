@@ -171,32 +171,15 @@ bool ResourceMap::ReadPage(HeadPosition from, HeadPosition to, Packages &package
     return true;
 }
 
-void ResourceMap::Reset()
+void ResourceMap::Clear()
 {
-/*
-    m_changing.clear();
-    m_appending.clear();
-*/
     m_pages.clear();
 }
 
 void ResourceMap::Close()
 {
-    Reset();
+    Clear();
     File::Close();
-}
-
-const ResourcePage& ResourceMap::At(Resource::Type type) const
-{
-    static const ResourcePage page_empty{ 0 };
-/*
-    if((type < eResourceType::first) || (type > eResourceType::last))
-        return page_empty;
-
-    tResourceMap::const_iterator it = m_resource_map.find(type);
-    return (it == m_resource_map.cend()) ? page_empty : it->second;
-*/
-    return page_empty;
 }
 
 /*

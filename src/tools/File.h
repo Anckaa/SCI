@@ -12,17 +12,12 @@ public:
     using Data = std::vector<uint8_t>;
 
 public:
+    /// @brief Constructors and destructor
+    File(std::ios_base::openmode mode) : m_mode(mode) {}
     File(const File &) = delete;
     File(File &&) = delete;
     File& operator = (const File &) = delete;
     File&& operator = (const File &&) = delete;
-
-public:
-    /// @brief Constructor
-    /// @param mode - of openning file
-    File(std::ios_base::openmode mode) : m_mode(mode) {}
-
-    /// @brief Destructor
     virtual ~File() { Close(); }
 
     /// @brief Open the file
@@ -83,16 +78,6 @@ public:
     /// @param err      - standard stream for output message about error
     /// @return true if reading is successed
     bool Read(Data &buffer, Data::size_type size, std::ostream &err) noexcept;
-
-/*
-    bool CopyTo(File &destination, std::ostream &err);
-    bool CopyTo(std::streampos position, File &destination, std::ostream &err);
-protected:
-    Data m_buffer;
-
-private:
-    static const Data::size_type s_buffer_size = 64 * 1024;
-*/
 
 private:
     const std::ios_base::openmode m_mode;       // the current mode for working with file
