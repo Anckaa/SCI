@@ -3,42 +3,59 @@
 #include "ResourceMap.h"
 #include "ResourcePackage.h"
 
-/// @brief Resource accessor
+/**
+ * @brief Resource accessor
+ *
+ * A class provides a base management with resources: to open files, to get resource, to replace it and etc.
+ */
 class ResourceAPI : private Resource
 {
 public:
-    /// @brief Constructors
+    /// @brief Default constructor.
     ResourceAPI() : m_map(this) {}
-    ResourceAPI(ResourceAPI &&) = delete;
-    ResourceAPI(const ResourceAPI &) = delete;
-    ResourceAPI& operator = (const ResourceAPI &) = delete;
-    ResourceAPI&& operator = (const ResourceAPI &&) = delete;
+    ResourceAPI(ResourceAPI &&) = delete;                       /// < Using of method is denied
+    ResourceAPI(const ResourceAPI &) = delete;                  /// < Using of method is denied
+    ResourceAPI& operator = (const ResourceAPI &) = delete;     /// < Using of method is denied
+    ResourceAPI&& operator = (const ResourceAPI &&) = delete;   /// < Using of method is denied
 
-    /// @brief Open map file with resources
-    /// @param filename - name of map file
-    /// @param err      - standard stream for output message about error
-    /// @return true if all resources were opened successfully
+    /**
+     * @brief Reads resources.
+     *
+     * @param[in] filename
+     *  Name of map file with every description of resource.
+     * @param[in,out] err
+     *  Standard io stream for output an error.
+     *
+     * @return true if all resources were opened successfully.
+     */
     bool Open(const char *filename, std::ostream &err);
 
-    /// @brief Close the current map file and clear all resourcess
+    /// @brief Clears all resourcess and closes all opened files.
     void Close();
 
-    /// @brief Get page with resources for specified type
-    /// @param type - type of resources (see to Resource::Type)
-    /// @return const reference to the page
+    /**
+     * @brief Gets page with description of all resources for specified type.
+     *
+     * @param[in] type
+     *  Type of resource.
+     *
+     * @return Reference to the page.
+     */
     const ResourcePage& operator[](Type type) const { return m_map[type]; }
 
-    /// @brief Get binary data of resource
-    /// @param type - type of resource (see to Resource::Type)
-    /// @param Id   - Index of resource
-    /// @param err  - standard stream for output message about error
-    /// @return reference to the binary data
+    /**
+     * @brief Gets a source data of resource.
+     *
+     * @param[in] type
+     *  Type of resource.
+     * @param[in] Id
+     *  Index of resource.
+     * @param[in,out] err
+     *  Standard io stream for output an error.
+     *
+     * @return Reference to the source data of resource.
+     */
     const Data& Get(Type type, Id id, std::ostream &err) const;
-/*
-    inline bool Delete(ResourceType type, Id id, std::ostream &err) { return m_map.Delete(type, id, err); }
-    inline bool Insert(ResourceType type, Id id, const BinaryData &data, std::ostream &err) { return m_map.Insert(type, id, data, err); }
-*/
-//    bool Save(std::ostream &err);
 
 private:
     using Packages = std::vector<ResourcePackage*>;
@@ -46,18 +63,13 @@ private:
 private:
     ResourceMap m_map;
     Packages    m_packages;
-// TODO: ???    Data        m_buffer;
 
-/* TODO: ???
-    bool CopyData(PackagePtr &package,
-                  ResourceMap::tOffsetArray::iterator &offset_cur, const cResourceMap::tOffsetArray::iterator &offset_end, std::ostream &err);
-*/
     /// @implements Resource
     /// @{
     bool PreparePackages(Package package_amount, std::ostream &err) override;
     bool OpenPackage(Package package_index, const char *filename, std::ostream &err) override;
     /// @}
 
-    /// @brief Clear all resources
+    /// @brief Clear all resources.
     void Reset();
 };

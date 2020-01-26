@@ -12,28 +12,28 @@ public:
     /// @brief Type of resource
     enum Type
     {
-        view     = 0x80,
-        pic      = 0x81,
-        script   = 0x82,
-        text     = 0x83,
-        sound    = 0x84,
-        object   = 0x85,
-        vocab    = 0x86,
-        font     = 0x87,
-        cursor   = 0x88,
-        patch    = 0x89,
-        bitmap   = 0x8a,
-        palette  = 0x8b,
-        cd_audio = 0x8c,
-        audio    = 0x8d,
-        sync     = 0x8c,
-        message  = 0x8f,
-        map      = 0x90,
-        dump     = 0x91,
+        view     = 0x80,    ///< View
+        pic      = 0x81,    ///< Picture
+        script   = 0x82,    ///< Script
+        text     = 0x83,    ///< Text
+        sound    = 0x84,    ///< Sound
+        object   = 0x85,    ///< Object
+        vocab    = 0x86,    ///< Vocabulary
+        font     = 0x87,    ///< Font
+        cursor   = 0x88,    ///< Cursor
+        patch    = 0x89,    ///< Patch
+        bitmap   = 0x8a,    ///< Bitmap
+        palette  = 0x8b,    ///< Pallete
+        cd_audio = 0x8c,    ///< CD Audio
+        audio    = 0x8d,    ///< Audio
+        sync     = 0x8c,    ///< Sync
+        message  = 0x8f,    ///< Message
+        map      = 0x90,    ///< Map
+        dump     = 0x91,    ///< Dump
 
-        type_first = view,
-        type_last  = dump,
-        type_none  = 0xFF
+        type_first = view,  ///< The first index of enumeration.
+        type_last  = dump,  ///< The last index of enumeration.
+        type_none  = 0xFF   ///< Index of undefined resource.
     };
 
     using Id = uint16_t;
