@@ -43,10 +43,7 @@ protected:
     inline void Clear() { m_using.clear(); }
 
     bool Allocate(Resource::Package package, Resource::Position position, Resource::Id id, std::ostream &err);
-/*
-    bool Insert(Resource::Id id, const Resouce::Data &data, Item *item, std::ostream &err);
-    bool Delete(Resource::Id id, /*Item *item, /std::ostream &err);
-*/
+
 private:
     using Items = std::vector<Item>;
     using ItemsPtr = std::set<Item *>;

@@ -1,23 +1,24 @@
 #include <stdafx.h>
 #include "ResourceAPI.h"
 
-using namespace std;
+namespace sci
+{
 
-bool ResourceAPI::Open(const char *filename, ostream &err)
+bool ResourceAPI::Open(const char *filename, std::ostream &err)
 {
     Close();
 
-    // TODO: need supporting for absolute path
+    // TODO: There is need support for absolute path here
     if(!m_map.Open(filename, err))
     {
-        ERROR_TO_STREAM(err) << "map file doesn't open\n";
+        ERROR_TO_STREAM(err) << "Map file hasn't opened.\n";
         return false;
     }
 
     return true;
 }
 
-bool ResourceAPI::PreparePackages(Package package_amount, ostream &err)
+bool ResourceAPI::PreparePackages(Package package_amount, std::ostream &err)
 {
     m_packages.clear();
 
@@ -34,26 +35,30 @@ bool ResourceAPI::PreparePackages(Package package_amount, ostream &err)
     return true;
 }
 
-bool ResourceAPI::OpenPackage(Resource::Package package_index, const char *filename, ostream &err)
+bool ResourceAPI::OpenPackage(Package package_index, const char *filename, std::ostream &err)
 {
     if(m_packages.empty())
     {
-        ERROR_TO_STREAM(err) << "attempt to open unexsist package\n";
+        ERROR_TO_STREAM(err) << "An attempt to open the package when anything is't been prepared.\n";
         return false;
     }
 
     if(package_index >= m_packages.size())
     {
-        ERROR_TO_STREAM(err) << "index of package file is out of range\n";
+        ERROR_TO_STREAM(err) << "Index of package is out of range. Index is " << package_index << ", "
+                             << "Amount of packages is " << m_packages.size() << ".\n";
         return false;
     }
 
+/* TODO: there is need redactoring here
     auto &package = m_packages[package_index];
     if (!package)
     {
-        package.reset(new cResourcePackage());
+        package.reset(new ResourcePackage());
     }
     return package->Open(filename, err);
+*/
+    return false;
 }
 
 void ResourceAPI::Close()
@@ -62,7 +67,7 @@ void ResourceAPI::Close()
     m_packages.clear();
 }
 
-const Resource::Data& ResourceAPI::Get(Type type, Id id, ostream &err) const
+const Resource::Data& ResourceAPI::Get(Type type, Id id, std::ostream &err) const
 {
     static const Data data_empty{0};
 /*
@@ -101,3 +106,5 @@ const Resource::Data& ResourceAPI::Get(Type type, Id id, ostream &err) const
 */
     return data_empty;
 }
+
+} // sci

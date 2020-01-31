@@ -1,7 +1,7 @@
 #pragma once
 
+#include <cstdint>
 #include <stdexcept>
-#include <stdint.h>
 
 /// @brief Bit reader
 class BitRead

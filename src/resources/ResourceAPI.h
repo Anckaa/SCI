@@ -3,6 +3,11 @@
 #include "ResourceMap.h"
 #include "ResourcePackage.h"
 
+namespace sci
+{
+///@addtogroup SciApi
+///@{
+
 /**
  * @brief Resource accessor
  *
@@ -13,28 +18,32 @@ class ResourceAPI : private Resource
 public:
     /// @brief Default constructor.
     ResourceAPI() : m_map(this) {}
-    ResourceAPI(ResourceAPI &&) = delete;                       /// < Using of method is denied
-    ResourceAPI(const ResourceAPI &) = delete;                  /// < Using of method is denied
-    ResourceAPI& operator = (const ResourceAPI &) = delete;     /// < Using of method is denied
-    ResourceAPI&& operator = (const ResourceAPI &&) = delete;   /// < Using of method is denied
+
+    /// @private using a method is denied
+    /// @{
+    ResourceAPI(ResourceAPI &&) = delete;
+    ResourceAPI(const ResourceAPI &) = delete;
+    ResourceAPI& operator = (const ResourceAPI &) = delete;
+    ResourceAPI&& operator = (const ResourceAPI &&) = delete;
+    /// @}
 
     /**
-     * @brief Reads resources.
+     * @brief Preparing files with resources.
      *
      * @param[in] filename
-     *  Name of map file with every description of resource.
-     * @param[in,out] err
-     *  Standard io stream for output an error.
+     *  Name of map file with all descriptions.
+     * @param[out] err
+     *  A standard stream that will be got messages if the method has error.
      *
-     * @return true if all resources were opened successfully.
+     * @return true if all resources is opened successfully.
      */
     bool Open(const char *filename, std::ostream &err);
 
-    /// @brief Clears all resourcess and closes all opened files.
+    /// @brief All opened resources will been freed, and all opened files will been closed.
     void Close();
 
     /**
-     * @brief Gets page with description of all resources for specified type.
+     * @brief Getting a page of descriptions for all resources with specified type.
      *
      * @param[in] type
      *  Type of resource.
@@ -44,25 +53,25 @@ public:
     const ResourcePage& operator[](Type type) const { return m_map[type]; }
 
     /**
-     * @brief Gets a source data of resource.
+     * @brief Getting a source data of resource.
      *
      * @param[in] type
      *  Type of resource.
-     * @param[in] Id
+     * @param[in] id
      *  Index of resource.
-     * @param[in,out] err
-     *  Standard io stream for output an error.
+     * @param[out] err
+     *  A standard stream that will be got messages if the method has error.
      *
      * @return Reference to the source data of resource.
      */
     const Data& Get(Type type, Id id, std::ostream &err) const;
 
 private:
-    using Packages = std::vector<ResourcePackage*>;
+    using Packages = std::vector<ResourcePackage*>; ///< A type for container of packages with resources.
 
 private:
-    ResourceMap m_map;
-    Packages    m_packages;
+    ResourceMap m_map;      ///< Map with all descriptions of resources.
+    Packages    m_packages; ///< A collection of packages with resources.
 
     /// @implements Resource
     /// @{
@@ -73,3 +82,6 @@ private:
     /// @brief Clear all resources.
     void Reset();
 };
+
+///@} SciApi
+} // sci

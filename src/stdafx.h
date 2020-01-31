@@ -16,6 +16,7 @@
 #include <algorithm>
 */
 #include <climits>  //+
+#include <cstdint>  //+
 #include <iostream> //+
 #include <fstream>  //+
 #include <list>
@@ -23,7 +24,6 @@
 #include <set>
 #include <stdexcept>//+
 #include <string>
-#include <stdint.h> //+
 #include <vector>   //+
 
 // add Qt modules here
@@ -34,12 +34,12 @@
 //add common variables here
 #endif // __cplusplus
 
-#define CLASSNAME_TO_STREAM(stream)                                             \
-{                                                                               \
-    const char *classname_ptr = typeid(*this).name();                           \
-    while((*classname_ptr <= '9') && (*classname_ptr >= '0')) ++classname_ptr;  \
-    stream << classname_ptr;                                                    \
-}                                                                               \
+#define CLASSNAME_TO_STREAM(stream)                                                                         \
+{                                                                                                           \
+    const char *classname_ptr = typeid(*this).name();                                                       \
+    while((*classname_ptr != '\0') && (*classname_ptr <= '9') && (*classname_ptr >= '0')) ++classname_ptr;  \
+    stream << classname_ptr;                                                                                \
+}                                                                                                           \
 stream
 
 #define CLASSFUNC_TO_STREAM(stream)                                                                                                 \
@@ -50,7 +50,21 @@ stream
 CLASSFUNC_TO_STREAM(stream) << ":\n\t"; \
 stream
 
-/// @brief User-defined suffix operator _s for more efficiently conversion of string literal to std::string
+#define WARNING_TO_STREAM(stream)       \
+stream << "WARNING: "                   \
+CLASSFUNC_TO_STREAM(stream) << ":\n\t"; \
+stream
+
+/**
+ * @brief User-defined suffix operator _s for more efficiently conversion of string literal to std::string
+ *
+ * @param[in] text
+ *  Pointer to c-string for conversion
+ * @param[in] size
+ *  Length of text
+ *
+ * @return A standard string class that will been contain the input text.
+ */
 inline std::string operator ""_s(const char *text, std::size_t size)
 {
    return std::string(text, size);

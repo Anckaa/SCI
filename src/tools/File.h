@@ -1,86 +1,170 @@
 #pragma once
 
-#include <iostream>
+#include <cstdint>
 #include <fstream>
-#include <stdint.h>
+#include <string>
 #include <vector>
 
-/// @brief Base processing of file
+namespace sci
+{
+/**
+ * @defgroup SciTools SCI Tools
+ * @brief The module provides tool set for working with SCI resources.
+ *
+ * There is have tools for working with files.
+ * @{
+ */
+
+/**
+ * @brief A file processing.
+ *
+ * A class provides a base management with files: to open text/binary files, to read data, to move into file and etc.
+ */
 class File
 {
 public:
-    using Data = std::vector<uint8_t>;
+    using Data = std::vector<uint8_t>;  ///< @brief A type for container of binary data that has been got from file.
 
 public:
-    /// @brief Constructors and destructor
-    File(std::ios_base::openmode mode) : m_mode(mode) {}
-    File(const File &) = delete;
-    File(File &&) = delete;
-    File& operator = (const File &) = delete;
-    File&& operator = (const File &&) = delete;
-    virtual ~File() { Close(); }
+    /**
+     * @brief Default constructor.
+     *
+     * @param[in] mode
+     *  Type for file opening mode flags.
+     */
+    File(std::ios_base::openmode mode);
 
-    /// @brief Open the file
-    /// @param filename - c-string with path to file
-    /// @param err      - standard stream for output message about error
-    /// @return true if file was open success
-    virtual bool Open(const char *filename, std::ostream &err);
+    /// @brief Default destructor.
+    virtual ~File();
 
-    /// @brief Close the current file
-    virtual void Close();
+    File(const File &) = delete;                ///< @private using a method is denied
+    File(File &&) = delete;                     ///< @private using a method is denied
+    File& operator = (const File &) = delete;   ///< @private using a method is denied
+    File&& operator = (const File &&) = delete; ///< @private using a method is denied
 
-    /// @brief Getting the current mode
-    std::ios_base::openmode Mode() const { return m_mode; }
+    /**
+     * @brief Open the file.
+     *
+     * @param[in] filename
+     *  c-string with path to file.
+     * @param[out] err
+     *  A standard stream that will be got messages if the method has error.
+     *
+     * @return true if file is opened successfully.
+     */
+    virtual bool Open(const char *filename, std::ostream &err) noexcept;
 
-    /// @brief Getting the current filename
-    /// @note will be returned empty c-string if filename isn`t  set
-    const char* Filename() const { return m_filename.c_str(); }
+    /**
+     * @brief Close the current file.
+     *
+     * @return true if file is closed successfully.
+     */
+    virtual bool Close() noexcept;
 
-    /// @brief Getting status of file
-    /// @return true if file is open
-    bool IsOpen() const { return m_stream.is_open(); }
+    /// @brief Getting the current mode.
+    inline std::ios_base::openmode Mode() const noexcept;
 
-    /// @brief Getting the current position
-    /// @return start position for processing
-    std::streampos Position() { return m_stream.tellg(); }
+    /**
+     * @brief Getting the current filename.
+     *
+     * @note If filename isn`t set, method returns empty c-string.
+     */
+    inline const char* Filename() const noexcept;
 
-    /// @brief Getting flag about end of file
-    /// @return true if file has data for reading
-    bool IsEof() const { return m_stream.eof(); }
+    /**
+     * @brief Getting status of file.
+     *
+     * @return true if file is open.
+     */
+    inline bool IsOpen() const noexcept;
 
-    /// @brief Setting the absolute position
-    /// @param pos - value the new position
-    void Position(std::streampos pos) { m_stream.seekg(pos); }
+    /**
+     * @brief Getting flag about end of file.
+     *
+     * @return true if file has data for reading.
+     */
+    inline bool IsEof() const noexcept;
 
-    /// @brief Setting the relevate position
-    /// @param offset - delta for jump
-    void Seek(std::streamoff offset)  { m_stream.seekg(offset, std::ios_base::cur); }
+    /**
+     * @brief Getting the current position in the file.
+     *
+     * @return Start position for processing.
+     *
+     * @throw std::ios_base::failure is thrown by method if position isn't available.
+     */
+    std::streampos Position();
 
-    /// @brief Getting a byte from file
-    /// @return reading byte
-    uint8_t  Get() { return static_cast<uint8_t>(m_stream.get()); }
+    /**
+     * @brief Setting the absolute position in the current file.
+     *
+     * @param[in] pos
+     *  Value of the new position.
+     *
+     * @throw std::ios_base::failure is thrown by method if position isn't available.
+     */
+    void Position(std::streampos pos);
 
-    /// @brief Getting two byte from file
-    /// @return reading word
-    uint16_t Get16LE() { uint16_t value; m_stream.read(reinterpret_cast<char *>(&value), 2); return value; }
+    /**
+     * @brief Setting the relevate position in the current file.
+     *
+     * @param[in] offset
+     *  Delta for jumping.
+     *
+     * @throw std::ios_base::failure is thrown by method if position isn't available.
+     */
+    void Seek(std::streamoff offset);
 
-    /// @brief Getting three byte from file
-    /// @return reading double bytes, which has value in three low bytes
-    uint32_t Get24LE() { uint32_t value; m_stream.read(reinterpret_cast<char *>(&value), 3); return value; }
+    /**
+     * @brief Reading a byte from the file.
+     *
+     * @throw std::ios_base::failure is thrown by method if reading isn't available.
+     */
+    uint8_t Get();
 
-    /// @brief Getting four byte from file
-    /// @return reading double word
-    uint32_t Get32LE() { uint32_t value; m_stream.read(reinterpret_cast<char *>(&value), 4); return value; }
+    /**
+     * @brief Reading two byte from file.
+     *
+     * @throw std::ios_base::failure is thrown by method if reading isn't available.
+     */
+    uint16_t Get16LE();
 
-    /// @brief Read data from file
-    /// @param buffer   - container for data
-    /// @param size     - size of container
-    /// @param err      - standard stream for output message about error
-    /// @return true if reading is successed
+    /**
+     * @brief Reading three byte from file.
+     *
+     * @return A double bytes, which has value in three low bytes.
+     *
+     * @throw std::ios_base::failure is thrown by method if reading isn't available.
+     */
+    uint32_t Get24LE();
+
+    /**
+     * @brief Getting four byte from file.
+     *
+     * @throw std::ios_base::failure is thrown by method if reading isn't available.
+     */
+    uint32_t Get32LE();
+
+    /**
+     * @brief Reading data from file.
+     *
+     * @param[out] buffer
+     *  Container with reading data.
+     * @param[in] size
+     *  Size of the container.
+     * @param[out] err
+     *  A standard stream that will be got messages if the method has error.
+     *
+     * @return true if reading is finished successfully.
+     */
     bool Read(Data &buffer, Data::size_type size, std::ostream &err) noexcept;
 
 private:
-    const std::ios_base::openmode m_mode;       // the current mode for working with file
-    std::fstream                  m_stream;     // the current file stream
-    std::string                   m_filename;   // the current filename
+    /**
+     * @brief Support a pImpl paradigm.
+     */
+    struct FileImpl;
+    FileImpl *m_impl;
 };
+
+///@} SciApi
+} // sci

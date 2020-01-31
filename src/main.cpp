@@ -79,7 +79,6 @@ int main(int argc, char* argv[])
     };
 //    output(data);
 
-/*
     Font font;
     if(!font.Import(data.data(), data.size(), err))
     {
@@ -105,34 +104,31 @@ int main(int argc, char* argv[])
             printf("\n");
         }
     }
-/**/
 
-/*
     if(!resource.Insert(eResourceType::font, 123, data, err))
     {
         printf("ERROR: %s\r\n", err.c_str());
         return 3;
     };
-*//*
+
     if(!resource.Delete(eResourceType::font, 123, err))
     {
         printf("ERROR: %s\r\n", err.c_str());
         return 4;
     };
-/*
     if(!resource.Insert(eResourceType::font, 0, data, err))
     {
         printf("ERROR: %s\r\n", err.c_str());
         return 5;
     };
-*//*
+
     if(!resource.Save(err))
     {
         printf("ERROR: %s\r\n", err.c_str());
         return 6;
     };
 
-/*
+
     QApplication app(argc, argv);
     return app.exec();
 */
