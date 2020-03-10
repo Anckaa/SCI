@@ -7,13 +7,8 @@
 
 namespace sci
 {
-/**
- * @defgroup SciTools SCI Tools
- * @brief The module provides tool set for working with SCI resources.
- *
- * There is have tools for working with files.
- * @{
- */
+///@addtogroup SciTools
+///@{
 
 /**
  * @brief A file processing.
@@ -86,9 +81,9 @@ public:
     inline bool IsEof() const noexcept;
 
     /**
-     * @brief Getting the current position in the file.
+     * @brief Getting the current  in the file.
      *
-     * @return Start position for processing.
+     * @return Start  for processing.
      *
      * @throw std::ios_base::failure is thrown by method if position isn't available.
      */
@@ -166,5 +161,5 @@ private:
     FileImpl *m_impl;
 };
 
-///@} SciApi
+///@} SciTools
 } // sci

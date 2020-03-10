@@ -4,7 +4,12 @@
 namespace sci
 {
 
-bool ResourceAPI::Open(const char *filename, std::ostream &err)
+ResourceAPI::ResourceAPI()
+    : m_map(this)
+{
+}
+
+bool ResourceAPI::Open(const char *filename, std::ostream &err) noexcept
 {
     Close();
 
@@ -18,7 +23,7 @@ bool ResourceAPI::Open(const char *filename, std::ostream &err)
     return true;
 }
 
-bool ResourceAPI::PreparePackages(Package package_amount, std::ostream &err)
+bool ResourceAPI::PreparePackages(Package package_amount, std::ostream &err) noexcept
 {
     m_packages.clear();
 
@@ -35,7 +40,7 @@ bool ResourceAPI::PreparePackages(Package package_amount, std::ostream &err)
     return true;
 }
 
-bool ResourceAPI::OpenPackage(Package package_index, const char *filename, std::ostream &err)
+bool ResourceAPI::OpenPackage(Package package_index, const char *filename, std::ostream &err) noexcept
 {
     if(m_packages.empty())
     {
@@ -61,10 +66,9 @@ bool ResourceAPI::OpenPackage(Package package_index, const char *filename, std::
     return false;
 }
 
-void ResourceAPI::Close()
+const ResourcePage& ResourceAPI::operator[](Type type) const
 {
-    m_map.Close();
-    m_packages.clear();
+    return m_map[type];
 }
 
 const Resource::Data& ResourceAPI::Get(Type type, Id id, std::ostream &err) const
@@ -105,6 +109,12 @@ const Resource::Data& ResourceAPI::Get(Type type, Id id, std::ostream &err) cons
     return m_buffer;
 */
     return data_empty;
+}
+
+void ResourceAPI::Close()
+{
+    m_map.Close();
+    m_packages.clear();
 }
 
 } // sci

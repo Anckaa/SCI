@@ -71,3 +71,18 @@ inline std::string operator ""_s(const char *text, std::size_t size)
 }
 
 #endif // stdafx_h
+
+/**
+ * @defgroup SciTools SCI Tools
+ * @brief The module provides tool set for working with SCI resources.
+ *
+ * There is have tools for working with files.
+ */
+
+/**
+ * @defgroup SciApi SCI API
+ * @brief The module provides a common API for working with resources.
+ *
+ * API can read fonts.
+ */
+

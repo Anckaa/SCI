@@ -17,15 +17,12 @@ class ResourceAPI : private Resource
 {
 public:
     /// @brief Default constructor.
-    ResourceAPI() : m_map(this) {}
+    ResourceAPI();
 
-    /// @private using a method is denied
-    /// @{
-    ResourceAPI(ResourceAPI &&) = delete;
-    ResourceAPI(const ResourceAPI &) = delete;
-    ResourceAPI& operator = (const ResourceAPI &) = delete;
-    ResourceAPI&& operator = (const ResourceAPI &&) = delete;
-    /// @}
+    ResourceAPI(ResourceAPI &&) = delete;                       ///< @private using a method is denied
+    ResourceAPI(const ResourceAPI &) = delete;                  ///< @private using a method is denied
+    ResourceAPI& operator = (const ResourceAPI &) = delete;     ///< @private using a method is denied
+    ResourceAPI&& operator = (const ResourceAPI &&) = delete;   ///< @private using a method is denied
 
     /**
      * @brief Preparing files with resources.
@@ -37,7 +34,7 @@ public:
      *
      * @return true if all resources is opened successfully.
      */
-    bool Open(const char *filename, std::ostream &err);
+    bool Open(const char *filename, std::ostream &err) noexcept;
 
     /// @brief All opened resources will been freed, and all opened files will been closed.
     void Close();
@@ -50,7 +47,7 @@ public:
      *
      * @return Reference to the page.
      */
-    const ResourcePage& operator[](Type type) const { return m_map[type]; }
+    const ResourcePage& operator[](Type type) const;
 
     /**
      * @brief Getting a source data of resource.
@@ -71,16 +68,16 @@ private:
 
 private:
     ResourceMap m_map;      ///< Map with all descriptions of resources.
-    Packages    m_packages; ///< A collection of packages with resources.
+    Packages m_packages;    ///< A collection of packages with resources.
 
     /// @implements Resource
     /// @{
-    bool PreparePackages(Package package_amount, std::ostream &err) override;
-    bool OpenPackage(Package package_index, const char *filename, std::ostream &err) override;
+    bool PreparePackages(Package package_amount, std::ostream &err) noexcept override;
+    bool OpenPackage(Package package_index, const char *filename, std::ostream &err) noexcept override;
     /// @}
 
     /// @brief Clear all resources.
-    void Reset();
+    void Reset() noexcept;
 };
 
 ///@} SciApi

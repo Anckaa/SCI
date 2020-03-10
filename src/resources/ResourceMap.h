@@ -3,75 +3,69 @@
 #include <File.h>
 #include "ResourcePage.h"
 
-/// @brief Resouce's map accessor
+namespace sci
+{
+///@addtogroup SciApi
+///@{
+
+/**
+ * @brief Resouce's map accessor
+ *
+ * A class provides information about location of resource.
+ */
 class ResourceMap : protected File
 {
 public:
+    /**
+     * @brief The Item struct
+     *
+     * A data of location to resource.
+     */
     struct Item
     {
-        const Resource::Data *data_ptr;
-        Resource::Package     package;
-        Resource::Position    position;
-        Resource::Offset      offset;
+        const Resource::Data *data_ptr; ///< A pointer to binary data of resource.
+        Resource::Package package;      ///< An index of package that contains the resource.
+        Resource::Position position;    ///< A position of resource in the package.
     };
-    using Items = std::vector<Item>;
 
+    using Items = std::vector<Item>;    ///< Collection of the locations.
 
 public:
-    /// @brief Constructors and destructor
-    ResourceMap() : File(std::ios_base::in | std::ios_base::binary) {}
-    ResourceMap(const ResourceMap &) = delete;
-    ResourceMap(ResourceMap &&) = delete;
-    ResourceMap& operator = (const ResourceMap &) = delete;
-    ResourceMap&& operator = (const ResourceMap &&) = delete;
-    ~ResourceMap() { Clear(); }
+    /// @brief Default Constructor.
+    ResourceMap();
+
+    /// @brief Default Destructor.
+    ~ResourceMap();
+
+    ResourceMap(const ResourceMap &) = delete;                  ///< @private using a method is denied.
+    ResourceMap(ResourceMap &&) = delete;                       ///< @private using a method is denied.
+    ResourceMap& operator = (const ResourceMap &) = delete;     ///< @private using a method is denied.
+    ResourceMap&& operator = (const ResourceMap &&) = delete;   ///< @private using a method is denied.
+
 
     /// @overload File
     /// @{
-    bool Open(const char *filename, std::ostream &err) override;
-    void Close() override;
+    bool Open(const char *filename, std::ostream &err) noexcept override;
+    void Close() noexcept override;
     /// @}
 
-    /// @brief Get page with resources for specified type
-    /// @param type - type of resources (see to Resource::Type)
-    /// @return const reference to the page
-    const ResourcePage& operator[](Resource::Type type) const { return m_pages[type]; }
-
-protected:
-    /// @brief Clear all map data
-    void Clear();
-
-private:
-    using HeadPosition = uint16_t;
-    struct HeadData
-    {
-        Resource::Type type;
-        HeadPosition position;
-    };
-
-    using Heads = std::list<HeadData>;
-    using Packages = std::vector<bool>;
-    using TypePages = std::map<Resource::Type, ResourcePage>;
+    /**
+     * @brief Get page with resource locations for specified type.
+     *
+     * @param[in] type
+     *  Type of resource.
+     *
+     * @return reference to the page.
+     */
+    const ResourcePage& operator[](Resource::Type type) const;
 
 private:
-    static const std::size_t s_head_size = 3;           // head of resource's map (in bits): 8 (type) 16 (position)
-    static const std::size_t s_page_item_size = 6;      // page item of resource (in bits): 16 (id) + 28 (position) + 4 (index of package)
-    static const Resource::Package s_package_size = 16; // total packages involved (index for filename "RESOURCE.XXX")
+    TypePages m_pages;  ///< A collection of the pages.
 
-    TypePages m_pages;
-
-    /// @brief Reading fields of heads
-    /// @param head - reference to list of heads
-    /// @param err  - standard stream for output message about error
-    /// @return The first position in file after head
-    Resource::Position ReadHead(Heads &head, std::ostream &err);
-
-    /// @brief Reading fields of resources
-    /// @param from     - position in file for begin reading
-    /// @param to       - position in file of end reading
-    /// @param packages - list with using packages
-    /// @param resources- list of pages with resources
-    /// @param err      - standard stream for output message about error
-    /// @return true if reading is finished sucessfully
-    bool ReadPage(Resource::Position from, Resource::Position to, Packages &packages, ResourcePage &resources, std::ostream &err);
+private:
+    /// @brief Clear all data.
+    void Clear() noexcept;
 };
+
+///@} SciApi
+} // sci

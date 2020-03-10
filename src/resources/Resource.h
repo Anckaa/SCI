@@ -7,13 +7,8 @@
 
 namespace sci
 {
-/**
- * @defgroup SciApi SCI API
- * @brief The module provides a common API for working with resources.
- *
- * API can read fonts.
- * @{
- */
+///@addtogroup SciApi
+///@{
 
 /**
  * @brief Shared API
@@ -76,7 +71,7 @@ public:
      *
      * @return true if initialization is finished successfully.
      */
-    virtual bool PreparePackages(Package package_amount, std::ostream &err) = 0;
+    virtual bool PreparePackages(Package package_amount, std::ostream &err) noexcept = 0;
 
     /**
      * @brief Initialization of a package with resources.
@@ -90,7 +85,7 @@ public:
      *
      * @return true if initialization is finished successfully.
      */
-    virtual bool OpenPackage(Package package_index, const char *filename, std::ostream &err) = 0;
+    virtual bool OpenPackage(Package package_index, const char *filename, std::ostream &err) noexcept = 0;
 
 private:
     /**
