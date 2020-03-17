@@ -1,3 +1,9 @@
+/**
+ * @file stdafx.h
+ * @brief This file includes shared libraries and defines common methods/data.
+ * @author Anatoly Tereschenko
+ */
+
 #ifndef stdafx_h
 #define stdafx_h
 
@@ -11,8 +17,12 @@
 // add C includes here
 
 #ifdef __cplusplus
-/*
+
 // add C++ includes here
+// add common prject's module here
+
+/*
+// add standard libraries here
 #include <algorithm>
 */
 #include <climits>  //+
@@ -29,11 +39,15 @@
 // add Qt modules here
 //#include <QtWidgets>
 
-//add common prject's module here
-
 //add common variables here
 #endif // __cplusplus
 
+/**
+ * @brief Macro passes a name of the current class to output stream
+ *
+ * @param[out] stream
+ *  The output stream
+ */
 #define CLASSNAME_TO_STREAM(stream)                                                                         \
 {                                                                                                           \
     const char *classname_ptr = typeid(*this).name();                                                       \
@@ -42,14 +56,33 @@
 }                                                                                                           \
 stream
 
+/**
+ * @brief Macro passes a name of the current method of class to output stream
+ *
+ * @param[out] stream
+ *  The output stream
+ */
 #define CLASSFUNC_TO_STREAM(stream)                                                                                                 \
 CLASSNAME_TO_STREAM(stream) <<  "::" << __func__ << "(), \"" << __FILE__  << "\"" << ", " << static_cast<int>(__LINE__) << " line"; \
 stream
 
+/**
+ * @brief Macro passes a error from a method of class to output stream
+ *
+ * @param[out] stream
+ *  The output stream
+ */
 #define ERROR_TO_STREAM(stream)         \
+stream << "ERROR: "                     \
 CLASSFUNC_TO_STREAM(stream) << ":\n\t"; \
 stream
 
+/**
+ * @brief Macro passes a warning from a method of class to output stream
+ *
+ * @param[out] stream
+ *  The output stream
+ */
 #define WARNING_TO_STREAM(stream)       \
 stream << "WARNING: "                   \
 CLASSFUNC_TO_STREAM(stream) << ":\n\t"; \
@@ -65,7 +98,7 @@ stream
  *
  * @return A standard string class that will been contain the input text.
  */
-inline std::string operator ""_s(const char *text, std::size_t size)
+std::string operator ""_s(const char *text, std::size_t size)
 {
    return std::string(text, size);
 }

@@ -1,3 +1,9 @@
+/**
+ * @file Resource.h
+ * @brief This file defines a base class with shared members of API.
+ * @author Anatoly Tereschenko
+ */
+
 #pragma once
 
 #include <climits>
@@ -7,6 +13,9 @@
 
 namespace sci
 {
+namespace api
+{
+
 ///@addtogroup SciApi
 ///@{
 
@@ -14,7 +23,7 @@ namespace sci
  * @brief Shared API
  *
  * There is defined types, enumerations, constants that is used by resources.
- * Also interface provides the base API for working with files and resources.
+ * Also this interface provides internal API for working with files and resources.
  */
 class Resource
 {
@@ -68,6 +77,7 @@ public:
      *  Total number of packages.
      * @param[out] err
      *  A standard stream that will be got messages if the method has error.
+     * @todo an err must be replaced with global object
      *
      * @return true if initialization is finished successfully.
      */
@@ -82,6 +92,7 @@ public:
      *  Name of file that contained resources.
      * @param[out] err
      *  A standard stream that will be got messages if the method has error.
+     * @todo an err must be replaced with global object
      *
      * @return true if initialization is finished successfully.
      */
@@ -97,4 +108,5 @@ private:
 };
 
 ///@} SciApi
+} // api
 } // sci

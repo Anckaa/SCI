@@ -1,3 +1,9 @@
+/**
+ * @file ResourceAPI.h
+ * @brief This file defines a base management with SCI resources.
+ * @author Anatoly Tereschenko
+ */
+
 #pragma once
 
 #include "ResourceMap.h"
@@ -5,6 +11,9 @@
 
 namespace sci
 {
+namespace api
+{
+
 ///@addtogroup SciApi
 ///@{
 
@@ -81,4 +90,5 @@ private:
 };
 
 ///@} SciApi
+} // api
 } // sci
